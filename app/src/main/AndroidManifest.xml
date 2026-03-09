@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -11,9 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.TreadController">
 
-        <!-- Splash screen / app chooser — registered as a HOME launcher -->
+        <!-- DISABLED: HOME launcher removed so iFit runs uninterrupted.
+             To re-enable, add back HOME and DEFAULT categories to the intent-filter. -->
         <activity
             android:name=".LauncherActivity"
             android:exported="true"
@@ -21,8 +24,6 @@
             android:theme="@style/Theme.TreadController">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -42,10 +43,11 @@
             android:name=".service.BootReadyService"
             android:exported="false" />
 
+        <!-- DISABLED: boot receiver disabled while app is inactive -->
         <receiver
             android:name=".service.BootReceiver"
             android:exported="true"
-            android:enabled="true">
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+    id("com.google.protobuf")
 }
 
 android {
@@ -55,6 +56,31 @@ android {
     }
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.2"
+    }
+    plugins {
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.60.1"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+            task.plugins {
+                create("grpc") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
@@ -87,6 +113,15 @@ dependencies {
     // Core
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
+    // gRPC + Protobuf
+    implementation("io.grpc:grpc-okhttp:1.60.1")
+    implementation("io.grpc:grpc-protobuf-lite:1.60.1")
+    implementation("io.grpc:grpc-stub:1.60.1")
+    implementation("io.grpc:grpc-binder:1.60.1")
+    implementation("com.google.protobuf:protobuf-javalite:3.25.2")
+    // Required for javax.annotation used by generated gRPC stubs
+    compileOnly("org.apache.tomcat:annotations-api:6.0.53")
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")

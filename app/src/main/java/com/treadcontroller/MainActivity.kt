@@ -1,5 +1,7 @@
 package com.treadcontroller
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
@@ -7,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -20,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.treadcontroller.data.db.AppDatabase
+import com.treadcontroller.service.GlassOsService
 import com.treadcontroller.service.MockTreadmillService
 import com.treadcontroller.service.TreadmillService
 import com.treadcontroller.ui.screens.*
@@ -44,12 +49,27 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+        // Request storage permission for wolf log monitoring on treadmill
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1
+            )
+        }
+
         val db = AppDatabase.getInstance(this)
         val dao = db.workoutDao()
 
-        // Use mock service for development, GlassOS service on treadmill
-        val treadmillService: TreadmillService = MockTreadmillService()
-        // TODO: if (isOnTreadmill) GlassOsService(this) else MockTreadmillService()
+        // Auto-detect: use real GlassOS service on treadmill, mock for development
+        val isOnTreadmill = isEruInstalled()
+        Log.i("TC_INIT", "isOnTreadmill=$isOnTreadmill")
+        val treadmillService: TreadmillService = if (isOnTreadmill) {
+            Log.i("TC_INIT", "Using GlassOsService (real treadmill)")
+            GlassOsService(this)
+        } else {
+            Log.i("TC_INIT", "Using MockTreadmillService (development)")
+            MockTreadmillService()
+        }
 
         val dashboardViewModel = DashboardViewModel(treadmillService, applicationContext)
         val workoutBuilderViewModel = WorkoutBuilderViewModel(dao)
@@ -65,6 +85,15 @@ class MainActivity : ComponentActivity() {
                     historyViewModel = historyViewModel
                 )
             }
+        }
+    }
+
+    private fun isEruInstalled(): Boolean {
+        return try {
+            packageManager.getPackageInfo("com.ifit.eru", 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
         }
     }
 
