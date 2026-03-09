@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Treadmill icon: simple running figure silhouette -->
+    <!-- Circle background accent -->
+    <path
+        android:fillColor="#00D4FF"
+        android:pathData="M54,54m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+    <!-- "TC" text approximation -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M43,48L43,60L47,60L47,52L43,52ZM43,48L53,48L53,52L43,52Z"/>
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M55,48L65,48L65,52L55,52ZM55,56L65,56L65,60L55,60ZM55,48L59,48L59,60L55,60Z"/>
+</vector>
